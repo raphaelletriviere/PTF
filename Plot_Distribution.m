@@ -5,7 +5,7 @@
 %                          '2018_1025_zante','2019_0320_turkey','2019_0921_albania','2019_1126_albania', 
 %                          '2020_0502_crete','2020_1030_samos'
 
-HazardCurves=load('Output\HazardCurves_2020_0502_crete_sig20.mat'); %Choose the event 
+HazardCurves=load('Output\HazardCurves_2020_1030_samos_sig2.mat'); %Choose the event 
 HCthresholds=load("LocalInput\HCthresholds.txt");
 POI_coord=load('LocalInput\med-tsumaps\POIs.mat');
 
@@ -29,17 +29,17 @@ POI_lon_med=POI_coord.POIs.lon(138:1244,:);
 %2020_0502_crete: 34.288 25.739
 %2020_1030_samos: 37.839 26.829
 
-earthquake_lat= 34.288; %Choose Coordinates of the event
-earthquake_lon= 25.739;
+earthquake_lat= 37.839; %Choose Coordinates of the event
+earthquake_lon= 26.829;
 
 figure()
 geoplot(POI_lat_med,POI_lon_med,'b.',earthquake_lat,earthquake_lon,'rp',...
      'LineWidth',5)
 
-id1=find(POI_lat_med==34.952); % Choose latitude coordinate to obtain the indice
-id2=find(POI_lat_med==35.394);
-id3=find(POI_lat_med==32.6248);
-id4=find(POI_lat_med==32.0636);
+id1=find(POI_lat_med==38.1823); % Choose latitude coordinate to obtain the indice
+id2=find(POI_lat_med==37.3138);
+id3=find(POI_lat_med==37.6511);
+id4=find(POI_lat_med==37.2398);
 
 %%%%%%%%%%%%%%%%%%%%
 %Calculate distribution
