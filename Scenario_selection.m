@@ -1,43 +1,86 @@
 function  [ScenarioProb] =Scenario_selection(ScenarioProb)
 
-%%%%%%%%%%%%%%%%%
-%Sampling scenarii 
-% Insert this function in PTF_1_0.m after the line 691
-%%%%%%%%%%%%%%%%%
 
-% Sampling BS, if requiered
-Cumul_ProbBS=cumsum(ScenarioProb.ProbScenBS);             %Cumulate Probabilities
-ind_BS=randi([1 length(ScenarioProb.ProbScenBS)],1000,1); %Generate random number between 1 and the number of scenarii to build a vector 1000x1
-ind_BS=sort(ind_BS);                                      
-ProbScenBS=Cumul_ProbBS(ind_BS,:);
+%%%%%%%%%%%%%%%%%%
+%Sampling scenarii
+%%%%%%%%%%%%%%%%%%
+Num_scenario=3000;
 
-%Modification ScenarioProb structure to obtain only 1000 scenarii in each matrix
-ScenarioProb.ProbScenBS=ProbScenBS;
-ScenarioProb.ParScenBS_ID=ScenarioProb.ParScenBS_ID(ind_BS,:)
-ScenarioProb.ParScenBS=ScenarioProb.ParScenBS(ind_BS,:)
-ScenarioProb.ProbScenBSFact=ScenarioProb.ProbScenBSFact(ind_BS,:)
+%Random value
+al_val=rand(Num_scenario);  
+
+Cum_Prob_BS=cumsum(ScenarioProb.ProbScenBS);
+ech_prob_BS=zeros(Num_scenario,1);
+
+%Selction random value inside Cumulative Probability 
+for i=[1:length(al_val)]
+    [mini,indice]=min(abs(Cum_Prob_BS-al_val(i)));
+    ech_prob_BS(i)=Cum_Prob_BS(indice);
+end
+
+%Delete identic scenarii and Calculate probability
+ind_BS=zeros(Num_scenario,1);
+for i=[1:length(ech_prob_BS)]
+    ind_BS(i)=find(Cum_Prob_BS==ech_prob_BS(i));
+end
+
+ScenarioProb.ParScenBS_ID=ScenarioProb.ParScenBS_ID(ind_BS,:);
+[C_BS,ia,ic]=unique(ScenarioProb.ParScenBS_ID);
+
+ScenarioProb.ParScenBS=ScenarioProb.ParScenBS(C_BS,:);
+ScenarioProb.ProbScenBSFact=ScenarioProb.ProbScenBSFact(C_BS,:);
+ 
+rep_BS=zeros(length(C_BS),1);
+for i=[1:length(C_BS)]
+    rep_BS(i)=length(find(C_BS(i)==ScenarioProb.ParScenBS_ID));
+end 
+
+ScenarioProb.ParScenBS_ID=C_BS;
+ScenarioProb.ProbScenBS=zeros(length(ScenarioProb.ParScenBS_ID),1);
+
+for i=[1:length(ScenarioProb.ProbScenBS)]
+    ScenarioProb.ProbScenBS(i)=rep_BS(i)/Num_scenario;
+end
+
+
+%%%%%%%
 
 % Sampling PS scenarii, if requiered
 Tot_ProbScen=sum(ScenarioProb.ProbScenPS);
 
 if Tot_ProbScen>0
-    Cumul_ProbPS=cumsum(ScenarioProb.ProbScenPS);
-    ind_PS=randi([1 length(ScenarioProb.ProbScenPS)],1000,1);
-    ind_PS=sort(ind_PS);
-    ProbScenPS=Cumul_ProbBS(ind_PS,:);
+   Cum_Prob_PS=cumsum(ScenarioProb.ProbScenPS);
+   ech_prob_PS=zeros(Num_scenario,1);
 
-   ScenarioProb.ProbScenPS=ProbScenPS
-   ScenarioProb.ParScenPS_ID=ScenarioProb.ParScenPS_ID(ind_PS,:)
-   ScenarioProb.ParScenPS=ScenarioProb.ParScenPS(ind_PS,:)
-   ScenarioProb.ProbScenPSFact=ScenarioProb.ProbScenPSFact(ind_PS,:)
-end 
+   %Selction random value inside Cumulative Probability 
+   for i=[1:length(al_val)]
+       [mini,indice]=min(abs(Cum_Prob_PS-al_val(i)));
+       ech_prob_PS(i)=Cum_Prob_PS(indice);
+   end
 
-% RENORMALIZING (TO MANAGE EVENTS OUTSIDE nSigma, BS OF LARGE MAGNITUDES, ETC.
-ScenarioProb.TotProbBS_preNorm = sum(ScenarioProb.ProbScenBS);
-ScenarioProb.TotProbPS_preNorm = sum(ScenarioProb.ProbScenPS);
-ScenarioProb.TotProb_preNorm = ScenarioProb.TotProbBS_preNorm + ScenarioProb.TotProbPS_preNorm;
+   %Delete identic scenarii and Calculate probability
+   ind_PS=zeros(Num_scenario,1);
+   for i=[1:length(ech_prob_PS)]
+       ind_PS(i)=find(Cum_Prob_PS==ech_prob_PS(i));
+   end
 
-if ScenarioProb.TotProb_preNorm < 1.0
-    ScenarioProb.ProbScenBS = ScenarioProb.ProbScenBS / ScenarioProb.TotProb_preNorm;
-    ScenarioProb.ProbScenPS = ScenarioProb.ProbScenPS / ScenarioProb.TotProb_preNorm;
+   ScenarioProb.ParScenPS_ID=ScenarioProb.ParScenPS_ID(ind_PS,:);
+   [C_PS,ia,ic]=unique(ScenarioProb.ParScenPS_ID);
+
+   ScenarioProb.ParScenPS=ScenarioProb.ParScenPS(C_PS,:);
+   ScenarioProb.ProbScenPSFact=ScenarioProb.ProbScenPSFact(C_PS,:);
+ 
+   rep_PS=zeros(length(C_PS),1);
+   for i=[1:length(C_PS)]
+       rep_PS(i)=length(find(C_PS(i)==ScenarioProb.ParScenPS_ID));
+   end 
+
+   ScenarioProb.ParScenPS_ID=C_PS;
+   ScenarioProb.ProbScenPS=zeros(length(ScenarioProb.ParScenPS_ID),1);
+
+   for i=[1:length(ScenarioProb.ProbScenPS)]
+      ScenarioProb.ProbScenPS(i)=rep_PS(i)/Num_scenario;
+   end
+
+    
 end
