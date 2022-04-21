@@ -1,28 +1,28 @@
 function  [ScenarioProb] =Scenario_selection(ScenarioProb)
 
-
 %%%%%%%%%%%%%%%%%%
 %Sampling scenarii
 %%%%%%%%%%%%%%%%%%
-Num_scenario=3000;
+Num_scenario=10;
 
 %Random value
 al_val=rand(Num_scenario);  
 
 Cum_Prob_BS=cumsum(ScenarioProb.ProbScenBS);
-ech_prob_BS=zeros(Num_scenario,1);
+%ech_prob_BS=zeros(Num_scenario,1);
+ind_BS=zeros(Num_scenario,1);
 
-%Selction random value inside Cumulative Probability 
+%Selection random value inside Cumulative Probability 
 for i=[1:length(al_val)]
-    [mini,indice]=min(abs(Cum_Prob_BS-al_val(i)));
-    ech_prob_BS(i)=Cum_Prob_BS(indice);
+    mini=max(find(Cum_Prob_BS<al_val(i)));
+    %ech_prob_BS(i)=mini
+    ind_BS(i)=mini;
 end
 
 %Delete identic scenarii and Calculate probability
-ind_BS=zeros(Num_scenario,1);
-for i=[1:length(ech_prob_BS)]
-    ind_BS(i)=find(Cum_Prob_BS==ech_prob_BS(i));
-end
+%for i=[1:length(ech_prob_BS)]
+%    ind_BS(i)=find(Cum_Prob_BS==ech_prob_BS(i));
+%end
 
 ScenarioProb.ParScenBS_ID=ScenarioProb.ParScenBS_ID(ind_BS,:);
 [C_BS,ia,ic]=unique(ScenarioProb.ParScenBS_ID);
@@ -44,7 +44,6 @@ end
 
 
 %%%%%%%
-
 % Sampling PS scenarii, if requiered
 Tot_ProbScen=sum(ScenarioProb.ProbScenPS);
 
